@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Dashboard - MediCare AI{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Welcome Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-700 rounded-2xl p-8 text-white mb-8 fade-in">
+        <div class="flex items-center justify-between">
+            <div>
+                {% if messages %}
+                <div class="messages mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <h1 class="text-3xl font-bold mb-2">Welcome, Dr. {{ user.get_full_name }}! 👨‍⚕️</h1>
+                <p class="text-blue-100 text-lg">Here's your practice overview for today</p>
+                <div class="flex items-center mt-4 space-x-4 text-blue-200">
+                    <div class="flex items-center">
+                        <i class="fas fa-briefcase-medical mr-2"></i>
+                        <span>{{ doctor.get_specialization_display }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-star mr-2"></i>
+                        <span>{{ average_rating }}/5 ({{ total_reviews }} reviews)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-clock mr-2"></i>
+                        <span>{% if doctor.is_available %}Available{% else %}Not Available{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-4">
+                <i class="fas fa-user-md text-3xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover-scale border border-blue-200">
+            <div class="flex items-center">
+                <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-users text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Today's Appointments</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ today_appointments.count }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover-scale border border-green-200">
+            <div class="flex items-center">
+                <div class="bg-green-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-calendar-check text-green-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Total Appointments</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ total_appointments }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover-scale border border-yellow-200">
+            <div class="flex items-center">
+                <div class="bg-yellow-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Pending</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ pending_appointments }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover-scale border border-purple-200">
+            <div class="flex items-center">
+                <div class="bg-purple-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-star text-purple-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Average Rating</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ average_rating }}/5</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Today's Schedule -->
+        <div class="lg:col-span-2">
+            <!-- Today's Appointments -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-calendar-day mr-3 text-blue-600"></i>
+                        Today's Appointments
+                    </h2>
+                    <span class="text-sm text-gray-500">{{ timezone.now|date:"F d, Y" }}</span>
+                </div>
+                
+                {% if today_appointments %}
+                <div class="space-y-4">
+                    {% for appointment in today_appointments %}
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition duration-300">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="bg-blue-100 p-2 rounded-lg mr-4">
+                                    <i class="fas fa-user text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">{{ appointment.patient.get_full_name }}</h3>
+                                    <p class="text-sm text-gray-600">{{ appointment.time }}</p>
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="inline-block px-2 py-1 text-xs rounded-full 
+                                            {% if appointment.prediction_score and appointment.prediction_score > 0.7 %}bg-red-100 text-red-800
+                                            {% else %}bg-green-100 text-green-800{% endif %}">
+                                            {% if appointment.prediction_score %}
+                                                No-show Risk: {{ appointment.prediction_score|floatformat:1 }}
+                                            {% else %}
+                                                No data
+                                            {% endif %}
+                                        </span>
+                                        <span class="inline-block px-2 py-1 text-xs rounded-full 
+                                            {% if appointment.status == 'confirmed' %}bg-green-100 text-green-800
+                                            {% elif appointment.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                            {{ appointment.status|title }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-600">Reason</p>
+                                <p class="text-sm font-medium text-gray-800 truncate max-w-xs">{{ appointment.reason }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <i class="fas fa-calendar-check text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">No appointments scheduled for today</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- High Risk Appointments -->
+            {% if high_risk_appointments %}
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-3 text-red-600"></i>
+                    High No-Show Risk Appointments
+                </h2>
+                
+                <div class="space-y-4">
+                    {% for appointment in high_risk_appointments %}
+                    <div class="border border-red-200 rounded-lg p-4 bg-red-50">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="bg-red-100 p-2 rounded-lg mr-4">
+                                    <i class="fas fa-user text-red-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">{{ appointment.patient.get_full_name }}</h3>
+                                    <p class="text-sm text-gray-600">{{ appointment.date }} at {{ appointment.time }}</p>
+                                    <p class="text-sm text-red-600 font-semibold">
+                                        No-show Probability: {{ appointment.prediction_score|floatformat:1 }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="inline-block px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                                    High Risk
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
+                <div class="space-y-3">
+                    <a href="{% url 'doctors:update_doctor_profile' %}" 
+                       class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-300">
+                        <i class="fas fa-user-edit text-blue-600 mr-3"></i>
+                        <span class="font-medium text-gray-800">Update Profile</span>
+                    </a>
+                    <a href="{% url 'doctors:manage_availability' %}" 
+                       class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition duration-300">
+                        <i class="fas fa-calendar-alt text-green-600 mr-3"></i>
+                        <span class="font-medium text-gray-800">Manage Availability</span>
+                    </a>
+                    <a href="{% url 'doctors:doctor_appointments' %}" 
+                       class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition duration-300">
+                        <i class="fas fa-list-alt text-purple-600 mr-3"></i>
+                        <span class="font-medium text-gray-800">View All Appointments</span>
+                    </a>
+                    <a href="{% url 'doctors:doctor_reviews' %}" 
+                       class="flex items-center p-3 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition duration-300">
+                        <i class="fas fa-star text-yellow-600 mr-3"></i>
+                        <span class="font-medium text-gray-800">Patient Reviews</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Upcoming Appointments -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Upcoming Appointments</h3>
+                
+                {% if upcoming_appointments %}
+                <div class="space-y-3">
+                    {% for appointment in upcoming_appointments %}
+                    <div class="border border-gray-200 rounded-lg p-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium text-gray-800 text-sm">{{ appointment.patient.get_full_name }}</p>
+                                <p class="text-xs text-gray-600">{{ appointment.date }} at {{ appointment.time }}</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full 
+                                {% if appointment.status == 'confirmed' %}bg-green-100 text-green-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ appointment.status|title }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-gray-500">
+                    <i class="fas fa-calendar-plus text-2xl mb-2"></i>
+                    <p class="text-sm">No upcoming appointments</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Availability Status -->
+            <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white">
+                <h3 class="text-lg font-bold mb-3">Availability Status</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-green-100">Current Status:</span>
+                    <span class="px-3 py-1 rounded-full text-sm font-medium {% if doctor.is_available %}bg-green-200 text-green-800{% else %}bg-red-200 text-red-800{% endif %}">
+                        {{ doctor.is_available|yesno:"Available,Not Available" }}
+                    </span>
+                </div>
+                <form method="POST" action="{% url 'doctors:toggle_availability' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-white text-green-600 py-2 rounded-lg font-medium hover:bg-green-50 transition duration-300">
+                        {% if doctor.is_available %}Set as Not Available{% else %}Set as Available{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Performance -->
+    <div class="mt-8 bg-white rounded-2xl shadow-lg p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-6">Recent Performance</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600 mb-2">{{ completed_appointments }}</div>
+                <div class="text-gray-600">Completed This Month</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-green-600 mb-2">{{ average_rating }}/5</div>
+                <div class="text-gray-600">Average Rating</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-purple-600 mb-2">{{ total_reviews }}</div>
+                <div class="text-gray-600">Total Reviews</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

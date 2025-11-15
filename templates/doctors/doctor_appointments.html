@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointment Management - MediCare AI{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 fade-in">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Appointment Management</h1>
+            <p class="text-gray-600">Manage your patient appointments and schedules</p>
+            {% if messages %}
+                <div class="messages mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+        </div>
+        <div class="mt-4 md:mt-0 flex space-x-3">
+            <a href="{% url 'doctors:doctor_dashboard' %}" 
+               class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-300 font-medium">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-blue-200">
+            <div class="flex items-center">
+                <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-calendar text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Total Appointments</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ appointments.count }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-green-200">
+            <div class="flex items-center">
+                <div class="bg-green-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Completed</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ appointments|length }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-yellow-200">
+            <div class="flex items-center">
+                <div class="bg-yellow-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Pending</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ appointments|length }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 shadow-lg border border-red-200">
+            <div class="flex items-center">
+                <div class="bg-red-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">High Risk</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ appointments|length }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div class="flex flex-wrap gap-4">
+            <a href="{% url 'doctors:doctor_appointments' %}" 
+               class="px-4 py-2 rounded-lg {% if not request.GET.status %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} transition duration-300">
+                All Appointments
+            </a>
+            <a href="?status=pending" 
+               class="px-4 py-2 rounded-lg {% if request.GET.status == 'pending' %}bg-yellow-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} transition duration-300">
+                Pending
+            </a>
+            <a href="?status=confirmed" 
+               class="px-4 py-2 rounded-lg {% if request.GET.status == 'confirmed' %}bg-green-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} transition duration-300">
+                Confirmed
+            </a>
+            <a href="?status=completed" 
+               class="px-4 py-2 rounded-lg {% if request.GET.status == 'completed' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} transition duration-300">
+                Completed
+            </a>
+            <a href="?status=cancelled" 
+               class="px-4 py-2 rounded-lg {% if request.GET.status == 'cancelled' %}bg-red-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} transition duration-300">
+                Cancelled
+            </a>
+        </div>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Patient
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date & Time
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Reason
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status & Risk
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for appointment in appointments %}
+                    <tr class="hover:bg-gray-50 transition duration-300">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-blue-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ appointment.patient.get_full_name }}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ appointment.patient.email }}
+                                    </div>
+                                    <div class="text-xs text-gray-400">
+                                        Phone: {{ appointment.patient.profile.phone|default:"Not provided" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ appointment.date }}</div>
+                            <div class="text-sm text-gray-500">{{ appointment.time }}</div>
+                            <div class="text-xs text-gray-400">
+                                {{ appointment.created_at|timesince }} ago
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900 max-w-xs">{{ appointment.reason|truncatewords:10 }}</div>
+                            {% if appointment.symptoms %}
+                            <div class="text-xs text-gray-500 mt-1">
+                                Symptoms: {{ appointment.symptoms|truncatewords:5 }}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="space-y-2">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                    {% if appointment.status == 'confirmed' %}bg-green-100 text-green-800
+                                    {% elif appointment.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif appointment.status == 'completed' %}bg-blue-100 text-blue-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                                
+                                {% if appointment.prediction_score and appointment.status in 'pending confirmed' %}
+                                <div class="text-xs {% if appointment.prediction_score > 0.7 %}text-red-600 font-semibold{% else %}text-gray-500{% endif %}">
+                                    No-show risk: {{ appointment.prediction_score|floatformat:1 }}
+                                    {% if appointment.prediction_score > 0.7 %}
+                                    <i class="fas fa-exclamation-triangle ml-1"></i>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <a href="{% url 'appointments:appointment_detail' appointment.id %}" 
+                                   class="text-blue-600 hover:text-blue-900 transition duration-300"
+                                   title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                
+                                {% if appointment.status in 'pending confirmed' %}
+                                <form method="POST" action="{% url 'appointments:update_appointment_status' appointment.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="completed">
+                                    <button type="submit" class="text-green-600 hover:text-green-900 transition duration-300"
+                                            title="Mark as Completed">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                
+                                {% if appointment.status in 'pending confirmed' %}
+                                <form method="POST" action="{% url 'appointments:update_appointment_status' appointment.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="cancelled">
+                                    <button type="submit" class="text-red-600 hover:text-red-900 transition duration-300"
+                                            title="Cancel Appointment"
+                                            onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                
+                                {% if appointment.status == 'completed' and not appointment.review %}
+                                <span class="text-gray-400" title="Waiting for patient review">
+                                    <i class="fas fa-star"></i>
+                                </span>
+                                {% elif appointment.review %}
+                                <a href="{% url 'doctors:doctor_reviews' %}" 
+                                   class="text-yellow-600 hover:text-yellow-900 transition duration-300"
+                                   title="View Review">
+                                    <i class="fas fa-star"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center">
+                            <i class="fas fa-calendar-times text-4xl text-gray-300 mb-4"></i>
+                            <h3 class="text-xl font-bold text-gray-600 mb-2">No appointments found</h3>
+                            <p class="text-gray-500">No appointments match your current filters</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- AI Insights -->
+    {% if appointments %}
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- No-Show Insights -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-robot mr-3 text-blue-600"></i>
+                AI No-Show Insights
+            </h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">High-risk appointments</span>
+                    <span class="font-semibold text-red-600">
+                        {{ appointments|length }} appointments
+                    </span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Average no-show risk</span>
+                    <span class="font-semibold text-yellow-600">
+                        {{ appointments|length }}%
+                    </span>
+                </div>
+                <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <p class="text-sm text-blue-700">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        Consider sending reminder messages to high-risk patients 24 hours before their appointments.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Optimization -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-chart-line mr-3 text-green-600"></i>
+                Schedule Optimization
+            </h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Peak appointment hours</span>
+                    <span class="font-semibold text-green-600">
+                        10:00 AM - 12:00 PM
+                    </span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Recommended buffer time</span>
+                    <span class="font-semibold text-purple-600">
+                        15 minutes
+                    </span>
+                </div>
+                <div class="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                    <p class="text-sm text-green-700">
+                        <i class="fas fa-clock mr-2"></i>
+                        Your current schedule has good distribution. Consider adding more slots during peak hours.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Confirm before cancelling appointments
+document.addEventListener('DOMContentLoaded', function() {
+    const cancelButtons = document.querySelectorAll('form button[title="Cancel Appointment"]');
+    cancelButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to cancel this appointment? This action cannot be undone.')) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

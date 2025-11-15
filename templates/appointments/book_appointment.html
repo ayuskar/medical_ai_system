@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment - MediCare AI{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden fade-in">
+        {% if messages %}
+                <div class="messages mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-700 p-8 text-white">
+            <div class="flex items-center space-x-6">
+                <div class="bg-white bg-opacity-20 rounded-full p-4">
+                    <i class="fas fa-calendar-plus text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">Book Appointment</h1>
+                    <p class="text-blue-100 text-lg">with Dr. {{ doctor.user.get_full_name }}</p>
+                    <p class="text-blue-200">{{ doctor.get_specialization_display }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Form -->
+        <div class="p-8">
+            <form method="POST" class="space-y-8">
+                {% csrf_token %}
+                
+                <!-- Date and Time -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-calendar-day mr-2 text-blue-600"></i>
+                            Appointment Date
+                        </label>
+                        {{ form.date }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-clock mr-2 text-green-600"></i>
+                            Preferred Time
+                        </label>
+                        {{ form.time }}
+                    </div>
+                </div>
+
+                <!-- Reason for Visit -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-file-medical mr-2 text-purple-600"></i>
+                        Reason for Visit
+                    </label>
+                    {{ form.reason }}
+                    <p class="text-sm text-gray-500 mt-1">Please describe the reason for your appointment in detail</p>
+                </div>
+
+                <!-- Symptoms -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-stethoscope mr-2 text-red-600"></i>
+                        Symptoms (Optional)
+                    </label>
+                    {{ form.symptoms }}
+                    <p class="text-sm text-gray-500 mt-1">Describe any symptoms you're experiencing</p>
+                </div>
+
+                <!-- Doctor Info -->
+                <div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Appointment Summary</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-user-md w-6 text-blue-600"></i>
+                            <span class="ml-2">Doctor: Dr. {{ doctor.user.get_full_name }}</span>
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-briefcase-medical w-6 text-green-600"></i>
+                            <span class="ml-2">Specialization: {{ doctor.get_specialization_display }}</span>
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-dollar-sign w-6 text-yellow-600"></i>
+                            <span class="ml-2">Consultation Fee: ${{ doctor.consultation_fee }}</span>
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-star w-6 text-purple-600"></i>
+                            <span class="ml-2">Rating: {{ doctor.get_rating|default:"0.0" }}/5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex justify-end space-x-4 pt-6">
+                    <a href="{% url 'doctors:doctor_detail' doctor.id %}" 
+                       class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition duration-300 font-medium">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        <i class="fas fa-calendar-check mr-2"></i>
+                        Book Appointment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

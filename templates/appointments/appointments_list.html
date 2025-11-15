@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}My Appointments - MediCare AI{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    {% if messages %}
+                <div class="messages mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 fade-in">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                {% if user.profile.role == 'patient' %}My Appointments
+                {% else %}Appointment Management{% endif %}
+            </h1>
+            <p class="text-gray-600">
+                {% if user.profile.role == 'patient' %}Manage your healthcare appointments
+                {% else %}Manage patient appointments and schedules{% endif %}
+            </p>
+        </div>
+        
+        {% if user.profile.role == 'patient' %}
+        <a href="{% url 'doctors:doctors_list' %}" 
+           class="mt-4 md:mt-0 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-medium">
+            <i class="fas fa-plus mr-2"></i>Book New Appointment
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div class="flex flex-wrap gap-4">
+            <a href="{% url 'appointments:appointments_list' %}" 
+               class="px-4 py-2 rounded-lg {% if not request.GET.status %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} transition duration-300">
+                All
+            </a>
+            {% for status_value, status_label in appointment_statuses %}
+            <a href="?status={{ status_value }}" 
+               class="px-4 py-2 rounded-lg {% if request.GET.status == status_value %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} transition duration-300">
+                {{ status_label }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Appointments List -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden fade-in">
+        {% if appointments %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {% if user.profile.role == 'patient' %}Doctor{% else %}Patient{% endif %}
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date & Time
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Reason
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for appointment in appointments %}
+                    <tr class="hover:bg-gray-50 transition duration-300">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-blue-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {% if user.profile.role == 'patient' %}
+                                        Dr. {{ appointment.doctor.get_full_name }}
+                                        {% else %}
+                                        {{ appointment.patient.get_full_name }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        {% if user.profile.role == 'patient' %}
+                                        {{ appointment.doctor.doctor.specialization }}
+                                        {% else %}
+                                        {{ appointment.patient.email }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ appointment.date }}</div>
+                            <div class="text-sm text-gray-500">{{ appointment.time }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900 max-w-xs truncate">{{ appointment.reason }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                {% if appointment.status == 'confirmed' %}bg-green-100 text-green-800
+                                {% elif appointment.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                {% elif appointment.status == 'completed' %}bg-blue-100 text-blue-800
+                                {% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ appointment.get_status_display }}
+                            </span>
+                            {% if appointment.prediction_score and user.profile.role == 'doctor' and appointment.status == 'pending' %}
+                            <div class="text-xs text-gray-500 mt-1">
+                                No-show risk: {{ appointment.prediction_score|floatformat:1 }}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <a href="{% url 'appointments:appointment_detail' appointment.id %}" 
+                                   class="text-blue-600 hover:text-blue-900 transition duration-300">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if user.profile.role == 'doctor' and appointment.status in 'pending confirmed' %}
+                                <form method="POST" action="{% url 'appointments:update_appointment_status' appointment.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="completed">
+                                    <button type="submit" class="text-green-600 hover:text-green-900 transition duration-300">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                {% if appointment.can_be_cancelled %}
+                                <form method="POST" action="{% url 'appointments:update_appointment_status' appointment.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="cancelled">
+                                    <button type="submit" class="text-red-600 hover:text-red-900 transition duration-300">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-calendar-times text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-600 mb-2">No appointments found</h3>
+            <p class="text-gray-500 mb-6">
+                {% if user.profile.role == 'patient' %}
+                You don't have any appointments yet.
+                {% else %}
+                No appointments scheduled.
+                {% endif %}
+            </p>
+            {% if user.profile.role == 'patient' %}
+            <a href="{% url 'doctors:doctors_list' %}" 
+               class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-medium">
+                Book Your First Appointment
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Stats -->
+    {% if appointments %}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+        <div class="bg-white rounded-2xl shadow-lg p-6 text-center">
+            <div class="text-2xl font-bold text-blue-600 mb-2">{{ total_appointments }}</div>
+            <div class="text-gray-600">Total Appointments</div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-lg p-6 text-center">
+            <div class="text-2xl font-bold text-green-600 mb-2">{{ upcoming_appointments }}</div>
+            <div class="text-gray-600">Upcoming</div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-lg p-6 text-center">
+            <div class="text-2xl font-bold text-yellow-600 mb-2">{{ pending_appointments }}</div>
+            <div class="text-gray-600">Pending</div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-lg p-6 text-center">
+            <div class="text-2xl font-bold text-purple-600 mb-2">{{ completed_appointments }}</div>
+            <div class="text-gray-600">Completed</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

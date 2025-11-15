@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="gradient-bg text-white py-20">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h1 class="text-5xl font-bold mb-6 leading-tight">
+                    Smart Healthcare <br>
+                    <span class="text-yellow-300">Powered by AI</span>
+                </h1>
+                <p class="text-xl mb-8 text-blue-100">
+                    Experience the future of healthcare with our AI-powered medical platform. 
+                    Book appointments, check symptoms, and get intelligent predictions for better healthcare decisions.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'doctors_list' %}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition duration-300 text-center">
+                            Book Appointment
+                        </a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition duration-300 text-center">
+                            Get Started
+                        </a>
+                    {% endif %}
+                    <a href="#features" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-600 transition duration-300 text-center">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="glass-effect rounded-2xl p-8 hover-scale">
+                    <div class="text-center">
+                        <i class="fas fa-brain text-6xl text-yellow-300 mb-4"></i>
+                        <h3 class="text-2xl font-bold mb-4">AI-Powered Predictions</h3>
+                        <p class="text-blue-100">Smart algorithms to predict no-show appointments and analyze symptoms</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Why Choose MediCare AI?</h2>
+            <p class="text-xl text-gray-600">Advanced features for modern healthcare needs</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-100 p-8 rounded-2xl hover-scale border border-blue-200">
+                <div class="text-blue-600 mb-4">
+                    <i class="fas fa-robot text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">AI No-Show Prediction</h3>
+                <p class="text-gray-600 mb-4">
+                    Our intelligent system predicts appointment no-shows with 85% accuracy, helping doctors optimize their schedules.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Reduce missed appointments</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Optimize doctor schedules</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Save time and resources</li>
+                </ul>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-100 p-8 rounded-2xl hover-scale border border-green-200">
+                <div class="text-green-600 mb-4">
+                    <i class="fas fa-stethoscope text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Smart Symptom Checker</h3>
+                <p class="text-gray-600 mb-4">
+                    Get instant AI-powered analysis of your symptoms with possible condition suggestions and recommendations.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Instant symptom analysis</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Condition suggestions</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Doctor recommendations</li>
+                </ul>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="bg-gradient-to-br from-purple-50 to-violet-100 p-8 rounded-2xl hover-scale border border-purple-200">
+                <div class="text-purple-600 mb-4">
+                    <i class="fas fa-comment-medical text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Sentiment Analysis</h3>
+                <p class="text-gray-600 mb-4">
+                    Advanced NLP algorithms analyze patient reviews to provide insights and improve healthcare services.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Review sentiment analysis</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Service quality insights</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Continuous improvement</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-16 bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+                <div class="text-4xl font-bold text-blue-400 mb-2">500+</div>
+                <div class="text-gray-400">Happy Patients</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-green-400 mb-2">50+</div>
+                <div class="text-gray-400">Expert Doctors</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-purple-400 mb-2">95%</div>
+                <div class="text-gray-400">Accuracy Rate</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-yellow-400 mb-2">24/7</div>
+                <div class="text-gray-400">Support Available</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+    <div class="max-w-4xl mx-auto text-center px-4">
+        <h2 class="text-4xl font-bold mb-6">Ready to Experience Smart Healthcare?</h2>
+        <p class="text-xl mb-8 text-blue-100">
+            Join thousands of patients and doctors who trust our AI-powered platform for better healthcare management.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {% if user.is_authenticated %}
+                <a href="{% url 'doctors_list' %}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition duration-300">
+                    Book Your Appointment
+                </a>
+            {% else %}
+                <a href="{% url 'register' %}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition duration-300">
+                    Join Now - It's Free
+                </a>
+            {% endif %}
+            <a href="{% url 'doctors_list' %}" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-600 transition duration-300">
+                Meet Our Doctors
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-gradient text-white py-20">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="fade-in">
+                <h1 class="text-5xl font-bold mb-6 leading-tight">
+                    Advanced Healthcare <br>
+                    {% if messages %}
+                <div class="messages mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                    <span class="text-green-300">Powered by AI</span>
+                </h1>
+                <p class="text-xl mb-8 text-blue-100">
+                    Experience the future of healthcare with our AI-powered medical platform. 
+                    Book appointments, check symptoms, and get intelligent predictions for better healthcare decisions.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'doctors:doctors_list' %}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition duration-300 text-center hover-lift">
+                            <i class="fas fa-calendar-plus mr-2"></i>Book Appointment
+                        </a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition duration-300 text-center hover-lift">
+                            <i class="fas fa-user-plus mr-2"></i>Get Started
+                        </a>
+                    {% endif %}
+                    <a href="#features" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-600 transition duration-300 text-center hover-lift">
+                        <i class="fas fa-info-circle mr-2"></i>Learn More
+                    </a>
+                </div>
+            </div>
+            <div class="relative fade-in">
+                <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-8 hover-lift border border-white border-opacity-20">
+                    <div class="text-center">
+                        <i class="fas fa-brain text-6xl text-green-300 mb-4"></i>
+                        <h3 class="text-2xl font-bold mb-4">AI-Powered Healthcare</h3>
+                        <p class="text-blue-100">Smart algorithms to predict no-show appointments and analyze symptoms with precision</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-16 fade-in">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Why Choose MediCare AI?</h2>
+            <p class="text-xl text-gray-600">Advanced features for modern healthcare needs</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="feature-card rounded-2xl p-8 hover-lift fade-in">
+                <div class="text-blue-600 mb-4">
+                    <i class="fas fa-robot text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">AI No-Show Prediction</h3>
+                <p class="text-gray-600 mb-4">
+                    Our intelligent system predicts appointment no-shows with 85% accuracy, helping doctors optimize their schedules.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Reduce missed appointments</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Optimize doctor schedules</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Save time and resources</li>
+                </ul>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="feature-card rounded-2xl p-8 hover-lift fade-in" style="border-left-color: #059669;">
+                <div class="text-green-600 mb-4">
+                    <i class="fas fa-stethoscope text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Smart Symptom Checker</h3>
+                <p class="text-gray-600 mb-4">
+                    Get instant AI-powered analysis of your symptoms with possible condition suggestions and recommendations.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Instant symptom analysis</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Condition suggestions</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Doctor recommendations</li>
+                </ul>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="feature-card rounded-2xl p-8 hover-lift fade-in" style="border-left-color: #7c3aed;">
+                <div class="text-purple-600 mb-4">
+                    <i class="fas fa-comment-medical text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Sentiment Analysis</h3>
+                <p class="text-gray-600 mb-4">
+                    Advanced NLP algorithms analyze patient reviews to provide insights and improve healthcare services.
+                </p>
+                <ul class="text-gray-600 space-y-2">
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Review sentiment analysis</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Service quality insights</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Continuous improvement</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-16 bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div class="fade-in">
+                <div class="text-4xl font-bold text-blue-400 mb-2">500+</div>
+                <div class="text-gray-400">Happy Patients</div>
+            </div>
+            <div class="fade-in">
+                <div class="text-4xl font-bold text-green-400 mb-2">50+</div>
+                <div class="text-gray-400">Expert Doctors</div>
+            </div>
+            <div class="fade-in">
+                <div class="text-4xl font-bold text-purple-400 mb-2">95%</div>
+                <div class="text-gray-400">Accuracy Rate</div>
+            </div>
+            <div class="fade-in">
+                <div class="text-4xl font-bold text-yellow-400 mb-2">24/7</div>
+                <div class="text-gray-400">Support Available</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+    <div class="max-w-4xl mx-auto text-center px-4">
+        <h2 class="text-4xl font-bold mb-6 fade-in">Ready to Experience Smart Healthcare?</h2>
+        <p class="text-xl mb-8 text-blue-100 fade-in">
+            Join thousands of patients and doctors who trust our AI-powered platform for better healthcare management.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in">
+            {% if user.is_authenticated %}
+                <a href="{% url 'doctors:doctors_list' %}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition duration-300 hover-lift">
+                    <i class="fas fa-calendar-plus mr-2"></i>Book Your Appointment
+                </a>
+            {% else %}
+                <a href="{% url 'register' %}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition duration-300 hover-lift">
+                    <i class="fas fa-user-plus mr-2"></i>Join Now - It's Free
+                </a>
+            {% endif %}
+            <a href="{% url 'doctors:doctors_list' %}" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-600 transition duration-300 hover-lift">
+                <i class="fas fa-user-md mr-2"></i>Meet Our Doctors
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

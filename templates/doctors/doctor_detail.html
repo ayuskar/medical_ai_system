@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block title %}Dr. {{ doctor.user.get_full_name }} - MediCare AI{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Doctor Profile Header -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8 fade-in">
+        <div class="bg-gradient-to-r from-blue-600 to-purple-700 p-8 text-white">
+            <div class="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
+                <!-- Doctor Image -->
+                <div class="flex-shrink-0">
+                    <img class="w-32 h-32 rounded-full object-cover border-4 border-white border-opacity-20" 
+                         src="{{ doctor.user.profile.profile_picture.url }}" 
+                         alt="Dr. {{ doctor.user.get_full_name }}">
+                </div>
+                
+                <!-- Doctor Info -->
+                <div class="flex-1 text-center md:text-left">
+                    <h1 class="text-3xl font-bold mb-2">Dr. {{ doctor.user.get_full_name }}</h1>
+                    <p class="text-xl text-blue-100 mb-4">{{ doctor.get_specialization_display }}</p>
+                    
+                    <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-blue-200">
+                        <div class="flex items-center">
+                            <i class="fas fa-briefcase mr-2"></i>
+                            <span>{{ doctor.experience }}+ years experience</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-star mr-2"></i>
+                            <span>{{ doctor.get_rating|default:"0.0" }} ({{ doctor.get_review_count }} reviews)</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-rupee-sign mr-2"></i>
+                            <span>{{ doctor.consultation_fee }} consultation</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Button -->
+                 {% if user.profile.role == 'patient' %}
+                <div class="flex-shrink-0">
+                    <a href="{% url 'appointments:book_appointment' doctor.id %}" 
+                       class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        Book Appointment
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- About Section -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-user-md mr-3 text-blue-600"></i>
+                    About Dr. {{ doctor.user.get_full_name }}
+                </h2>
+                <p class="text-gray-600 leading-relaxed">
+                     <h1>{{doctor.user.get_full_name}}</h1> is a dedicated healthcare professional with {{doctor.experience}}
+                    {{ doctor.about|default:"Dr. "|add:doctor.user.get_full_name|add:" is a dedicated healthcare professional with "|add:doctor.experience|stringformat:"d"|add:" years of experience in "|add:doctor.get_specialization_display|add:". Committed to providing exceptional patient care and staying updated with the latest medical advancements." }}
+                </p>
+                
+            </div>
+
+            <!-- Availability -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-calendar-alt mr-3 text-green-600"></i>
+                    Availability
+                </h2>
+                
+                {% if availabilities %}
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {% for availability in availabilities %}
+                    <div class="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                        <div class="text-lg font-semibold text-green-800 capitalize">{{ availability.day }}</div>
+                        <div class="text-sm text-green-600">
+                            {{ availability.start_time|time:"g:i A" }} - {{ availability.end_time|time:"g:i A" }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-calendar-times text-4xl mb-4"></i>
+                    <p>Availability schedule not specified</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Reviews -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-star mr-3 text-yellow-500"></i>
+                    Patient Reviews
+                </h2>
+                
+                {% if reviews %}
+                <div class="space-y-6">
+                    {% for review in reviews %}
+                    <div class="border border-gray-200 rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-user text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">{{ review.appointment.patient.get_full_name }}</h4>
+                                    <div class="flex items-center text-yellow-500">
+                                        {% for i in "12345" %}
+                                        <i class="fas fa-star{% if forloop.counter > review.rating %}-o{% endif %} text-sm"></i>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="text-sm text-gray-500">{{ review.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <p class="text-gray-600">{{ review.review_text }}</p>
+                        {% if review.sentiment %}
+                        <div class="mt-3 flex items-center">
+                            <span class="text-sm text-gray-500">Sentiment: </span>
+                            <span class="ml-2 px-2 py-1 text-xs rounded-full 
+                                {% if review.sentiment == 'POSITIVE' %}bg-green-100 text-green-800
+                                {% elif review.sentiment == 'NEGATIVE' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ review.sentiment|title }} ({{ review.sentiment_score }})
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-comment-slash text-4xl mb-4"></i>
+                    <p>No reviews yet</p>
+                    <p class="text-sm">Be the first to review this doctor</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Quick Info -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 fade-in">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Doctor Information</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-graduation-cap w-6 text-blue-600"></i>
+                        <span class="ml-3">Specialization: {{ doctor.get_specialization_display }}</span>
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-briefcase w-6 text-green-600"></i>
+                        <span class="ml-3">Experience: {{ doctor.experience }}+ years</span>
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-rupee-sign w-6 text-yellow-600"></i>
+                        <span class="ml-3">Fee: Rs. {{ doctor.consultation_fee }}</span>
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-id-card w-6 text-purple-600"></i>
+                        <span class="ml-3">License: {{ doctor.license_number|default:"Not specified" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book Appointment CTA -->
+            <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white text-center fade-in">
+                <i class="fas fa-calendar-check text-3xl mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Ready to Book?</h3>
+                <p class="text-green-100 mb-4">Schedule your appointment with Dr. {{ doctor.user.get_full_name }}</p>
+                {% if user.profile.role == 'patient' %}
+                <a href="{% url 'appointments:book_appointment' doctor.id %}" 
+                   class="inline-block bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition duration-300">
+                    Book Appointment
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Contact Info -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 fade-in">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Contact</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-envelope w-6 text-blue-600"></i>
+                        <span class="ml-3">{{ doctor.user.email }}</span>
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-phone w-6 text-green-600"></i>
+                        <span class="ml-3">{{ doctor.user.profile.phone|default:"Not specified" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

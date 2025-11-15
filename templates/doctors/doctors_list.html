@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Doctors - MediCare AI{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="text-center mb-12 fade-in">
+        {% if messages %}
+                <div class="messages mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Our Expert Doctors</h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Meet our team of highly qualified healthcare professionals dedicated to your well-being
+        </p>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Search -->
+            <div class="md:col-span-2">
+                <form method="GET" class="flex">
+                    <input type="text" name="search" placeholder="Search doctors by name or specialization..." 
+                           value="{{ request.GET.search }}"
+                           class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-r-lg hover:bg-blue-700 transition duration-300">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Specialization Filter -->
+            <div>
+                <form method="GET">
+                    <select name="specialization" onchange="this.form.submit()" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">All Specializations</option>
+                        {% for value, label in specializations %}
+                        <option value="{{ value }}" {% if request.GET.specialization == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctors Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for doctor in doctors %}
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover-scale fade-in" style="animation-delay: {{ forloop.counter0|add:1 }}00ms">
+            <!-- Doctor Image -->
+            <div class="h-48 bg-gradient-to-br from-blue-500 to-purple-600 relative">
+                <img src="{{ doctor.user.profile.profile_picture.url }}" 
+                     alt="{{ doctor.user.get_full_name }}"
+                     class="w-full h-full object-cover">
+                <div class="absolute top-4 right-4">
+                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        Available
+                    </span>
+                </div>
+            </div>
+
+            <!-- Doctor Info -->
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Dr. {{ doctor.user.get_full_name }}</h3>
+                <p class="text-blue-600 font-medium mb-3">{{ doctor.get_specialization_display }}</p>
+                
+                <div class="flex items-center text-gray-600 mb-4">
+                    <i class="fas fa-briefcase mr-2"></i>
+                    <span>{{ doctor.experience }}+ years experience</span>
+                </div>
+
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center text-yellow-500">
+                        {% with rating=doctor.get_rating %}
+                        {% for i in "12345" %}
+                        <i class="fas fa-star{% if forloop.counter > rating %}-o{% endif %} text-sm"></i>
+                        {% endfor %}
+                        <span class="ml-2 text-gray-600 text-sm">({{ doctor.get_review_count }})</span>
+                        {% endwith %}
+                    </div>
+                    <div class="text-green-600 font-bold">
+                        Rs. {{ doctor.consultation_fee }}
+                    </div>
+                </div>
+
+                <p class="text-gray-600 text-sm mb-6 line-clamp-2">{{ doctor.about|default:"Experienced professional dedicated to patient care." }}</p>
+
+                <div class="flex space-x-3">
+                    <a href="{% url 'doctors:doctor_detail' doctor.id %}" 
+                       class="flex-1 bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-medium">
+                        View Profile
+                    </a>
+                   {% if user.profile.role == 'patient' %}
+    <a href="{% url 'appointments:book_appointment' doctor.id %}" 
+       class="flex-1 bg-green-600 text-white text-center py-3 rounded-lg hover:bg-green-700 transition duration-300 font-medium">
+        Book Now
+    </a>
+{% endif %}
+
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="md:col-span-3 text-center py-12">
+            <i class="fas fa-user-md text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-600 mb-2">No doctors found</h3>
+            <p class="text-gray-500">Try adjusting your search criteria</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Stats Section -->
+    <div class="mt-16 bg-gradient-to-r from-blue-600 to-purple-700 rounded-2xl p-8 text-white text-center">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <div class="text-3xl font-bold mb-2">{{ doctors.count }}+</div>
+                <div class="text-blue-200">Expert Doctors</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold mb-2">24/7</div>
+                <div class="text-blue-200">Availability</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold mb-2">95%</div>
+                <div class="text-blue-200">Patient Satisfaction</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold mb-2">15+</div>
+                <div class="text-blue-200">Specializations</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
+{% endblock %}

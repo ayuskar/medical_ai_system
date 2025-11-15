@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Reviews - MediCare AI{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 fade-in">
+        <div>
+            {% if messages %}
+                <div class="messages mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Patient Reviews & Ratings</h1>
+            <p class="text-gray-600">Feedback from your patients to help improve your practice</p>
+        </div>
+        <div class="mt-4 md:mt-0">
+            <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                <div class="flex items-center">
+                    <div class="text-3xl font-bold text-blue-600 mr-3">{{ average_rating|default:"0.0" }}/5</div>
+                    <div>
+                        <div class="flex items-center text-yellow-500 mb-1">
+                            {% for i in "12345" %}
+                            <i class="fas fa-star{% if forloop.counter > average_rating %}-o{% endif %} text-sm"></i>
+                            {% endfor %}
+                        </div>
+                        <p class="text-sm text-gray-600">{{ total_reviews }} total reviews</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Rating Distribution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:col-span-2">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-chart-bar mr-3 text-blue-600"></i>
+                Rating Distribution
+            </h2>
+            <div class="space-y-3">
+                {% for rating in "54321" %}
+                {% with rating_num=rating|add:"0" %}
+                <div class="flex items-center">
+                    <span class="w-16 text-sm text-gray-600">{{ rating_num }} star</span>
+                    <div class="flex-1 bg-gray-200 rounded-full h-2 mx-3">
+                        <div class="bg-yellow-500 h-2 rounded-full" 
+                             style="width: {% widthratio rating_distribution.rating_num total_reviews 100 %}%"></div>
+                    </div>
+                    <span class="w-12 text-sm text-gray-600 text-right">{{ rating_distribution.rating_num }}</span>
+                </div>
+                {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Sentiment Analysis -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-brain mr-3 text-purple-600"></i>
+                Sentiment Analysis
+            </h2>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                        <span class="text-gray-600">Positive</span>
+                    </div>
+                    <span class="font-semibold text-green-600">{{ positive_reviews }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-gray-400 rounded-full mr-2"></div>
+                        <span class="text-gray-600">Neutral</span>
+                    </div>
+                    <span class="font-semibold text-gray-600">{{ neutral_reviews }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                        <span class="text-gray-600">Negative</span>
+                    </div>
+                    <span class="font-semibold text-red-600">{{ negative_reviews }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                <i class="fas fa-comments mr-3 text-green-600"></i>
+                All Patient Reviews
+            </h2>
+        </div>
+
+        {% if reviews %}
+        <div class="divide-y divide-gray-200">
+            {% for review in reviews %}
+            <div class="p-6 hover:bg-gray-50 transition duration-300">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ review.appointment.patient.get_full_name }}</h3>
+                            <div class="flex items-center mt-1">
+                                <div class="flex items-center text-yellow-500 mr-3">
+                                    {% for i in "12345" %}
+                                    <i class="fas fa-star{% if forloop.counter > review.rating %}-o{% endif %} text-sm"></i>
+                                    {% endfor %}
+                                </div>
+                                <span class="text-sm text-gray-500">{{ review.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-block px-3 py-1 text-xs rounded-full 
+                            {% if review.sentiment == 'POSITIVE' %}bg-green-100 text-green-800
+                            {% elif review.sentiment == 'NEGATIVE' %}bg-red-100 text-red-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ review.sentiment|title }}
+                        </span>
+                        {% if review.sentiment_score %}
+                        <p class="text-xs text-gray-500 mt-1">Score: {{ review.sentiment_score }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <p class="text-gray-600 mb-4">{{ review.review_text }}</p>
+                
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                    <div class="flex items-center">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        <span>Appointment: {{ review.appointment.date }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-stethoscope mr-2"></i>
+                        <span>Reason: {{ review.appointment.reason|truncatewords:5 }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-comment-slash text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-600 mb-2">No reviews yet</h3>
+            <p class="text-gray-500">Patient reviews will appear here once they submit feedback</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Review Insights -->
+    {% if reviews %}
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Positive Feedback -->
+        {% if positive_reviews > 0 %}
+        <div class="bg-green-50 rounded-2xl p-6 border border-green-200">
+            <h3 class="text-lg font-bold text-green-800 mb-3 flex items-center">
+                <i class="fas fa-thumbs-up mr-2"></i>
+                What Patients Love
+            </h3>
+            <ul class="space-y-2 text-green-700">
+                <li class="flex items-center">
+                    <i class="fas fa-check-circle mr-2 text-green-600"></i>
+                    Professional and caring approach
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-check-circle mr-2 text-green-600"></i>
+                    Clear communication and explanations
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-check-circle mr-2 text-green-600"></i>
+                    Minimal waiting time
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Improvement Areas -->
+        {% if negative_reviews > 0 %}
+        <div class="bg-blue-50 rounded-2xl p-6 border border-blue-200">
+            <h3 class="text-lg font-bold text-blue-800 mb-3 flex items-center">
+                <i class="fas fa-lightbulb mr-2"></i>
+                Areas for Improvement
+            </h3>
+            <ul class="space-y-2 text-blue-700">
+                <li class="flex items-center">
+                    <i class="fas fa-clock mr-2 text-blue-600"></i>
+                    Appointment scheduling flexibility
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-comments mr-2 text-blue-600"></i>
+                    Follow-up communication
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-calendar mr-2 text-blue-600"></i>
+                    Availability during peak hours
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
