@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'reviews',
     'ai_predictions',
     'notifications',
+    'contact'
 ]
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
@@ -143,3 +144,15 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Email settings for Gmail
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'aayushkrki11@gmail.com'
+EMAIL_HOST_PASSWORD = 'cfoi wnid xkvk zurd'  # Google App Password
+DEFAULT_FROM_EMAIL = 'aayushkrki11@gmail.com'
+SERVER_EMAIL = 'aayushkrki11@gmail.com'
+
+# Admin email for notifications
+ADMIN_EMAIL = 'aayushkrki11@gmail.com'

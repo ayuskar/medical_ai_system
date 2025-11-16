@@ -29,4 +29,5 @@ urlpatterns = [
     path('reviews/', include('reviews.urls')),
     path('ai/', include('ai_predictions.urls')),
     path('notifications/', include('notifications.urls')),
+    path('contact/', include('contact.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

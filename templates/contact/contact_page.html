@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - MediCare AI{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="text-center mb-12 fade-in">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Contact Us</h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            We're here to help! Get in touch with our support team for any questions or concerns.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Contact Information -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-info-circle mr-3 text-blue-600"></i>
+                    Get in Touch
+                </h2>
+                
+                <div class="space-y-6">
+                    <div class="flex items-start">
+                        <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-phone text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Phone Support</h3>
+                            <p class="text-gray-600">+1 (555) 123-4567</p>
+                            <p class="text-sm text-gray-500">Mon-Fri, 9AM-6PM EST</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="bg-green-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-envelope text-green-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Email</h3>
+                            <p class="text-gray-600">support@medicareai.com</p>
+                            <p class="text-sm text-gray-500">24/7 email support</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="bg-purple-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-clock text-purple-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Response Time</h3>
+                            <p class="text-gray-600">Within 24 hours</p>
+                            <p class="text-sm text-gray-500">Usually much faster</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="bg-yellow-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-headset text-yellow-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Live Chat</h3>
+                            <p class="text-gray-600">Available 24/7</p>
+                            <p class="text-sm text-gray-500">For immediate assistance</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Contact -->
+                <div class="mt-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <h4 class="font-semibold text-red-800 mb-2 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Medical Emergency?
+                    </h4>
+                    <p class="text-sm text-red-700">
+                        If this is a medical emergency, please call emergency services immediately.
+                    </p>
+                    <p class="text-lg font-bold text-red-800 mt-2">Call 911</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form and FAQs -->
+        <div class="lg:col-span-2">
+            <!-- Contact Form -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-paper-plane mr-3 text-green-600"></i>
+                    Send us a Message
+                </h2>
+
+                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                            {{ form.name }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                            {{ form.phone }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                            {{ form.category }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
+                        {{ form.subject }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                        {{ form.message }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Attachment (Optional)</label>
+                        {{ form.attachment }}
+                        <p class="text-sm text-gray-500 mt-1">Maximum file size: 10MB. Supported formats: PDF, JPG, PNG, DOC</p>
+                    </div>
+
+                    <button type="submit" 
+                            class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Send Message
+                    </button>
+                </form>
+            </div>
+
+            <!-- FAQs Section -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-question-circle mr-3 text-purple-600"></i>
+                    Frequently Asked Questions
+                </h2>
+
+                <div class="space-y-4">
+                    {% for category, faqs in faqs_by_category.items %}
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">
+                            {{ category|title }} Questions
+                        </h3>
+                        <div class="space-y-3">
+                            {% for faq in faqs %}
+                            <div class="border border-gray-200 rounded-lg">
+                                <button class="w-full text-left p-4 flex justify-between items-center hover:bg-gray-50 transition duration-300 faq-question">
+                                    <span class="font-medium text-gray-800">{{ faq.question }}</span>
+                                    <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                                </button>
+                                <div class="faq-answer hidden p-4 border-t border-gray-200 bg-gray-50">
+                                    <p class="text-gray-600">{{ faq.answer }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-question-circle text-4xl mb-4"></i>
+                        <p>No FAQs available at the moment.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-6 text-center">
+                    <a href="{% url 'contact:faq_list' %}" 
+                       class="text-blue-600 hover:text-blue-700 font-medium transition duration-300">
+                        View All FAQs <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// FAQ accordion functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    
+    faqQuestions.forEach(button => {
+        button.addEventListener('click', function() {
+            const answer = this.nextElementSibling;
+            const icon = this.querySelector('i');
+            
+            // Toggle current answer
+            answer.classList.toggle('hidden');
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+            
+            // Close other answers
+            faqQuestions.forEach(otherButton => {
+                if (otherButton !== button) {
+                    const otherAnswer = otherButton.nextElementSibling;
+                    const otherIcon = otherButton.querySelector('i');
+                    otherAnswer.classList.add('hidden');
+                    otherIcon.classList.remove('fa-chevron-up');
+                    otherIcon.classList.add('fa-chevron-down');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
