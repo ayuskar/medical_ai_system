@@ -16,22 +16,60 @@
             Thank you for contacting us. We have received your message and will get back to you within 24 hours.
         </p>
         
+        <!-- Email Confirmation -->
         <div class="bg-blue-50 rounded-lg p-6 mb-8 border border-blue-200">
-            <h3 class="font-semibold text-blue-800 mb-2">What happens next?</h3>
+            <div class="flex items-center justify-center mb-4">
+                <i class="fas fa-envelope text-2xl text-blue-600 mr-3"></i>
+                <h3 class="font-semibold text-blue-800 text-lg">Check Your Email</h3>
+            </div>
+            <p class="text-blue-700 mb-3">
+                We've sent a confirmation email to your inbox with details about your submission.
+            </p>
             <ul class="text-left text-blue-700 space-y-2 text-sm">
                 <li class="flex items-center">
-                    <i class="fas fa-envelope mr-3 text-blue-600"></i>
-                    You'll receive a confirmation email shortly
+                    <i class="fas fa-check-circle mr-3 text-green-500"></i>
+                    Confirmation email sent to your registered email address
                 </li>
                 <li class="flex items-center">
-                    <i class="fas fa-user-tie mr-3 text-blue-600"></i>
-                    Our team will review your message and assign it to the right department
+                    <i class="fas fa-user-tie mr-3 text-blue-500"></i>
+                    Our team has been notified and will review your message
                 </li>
                 <li class="flex items-center">
-                    <i class="fas fa-reply mr-3 text-blue-600"></i>
-                    We'll send you a detailed response within 24 hours
+                    <i class="fas fa-reply mr-3 text-purple-500"></i>
+                    You'll receive a detailed response within 24 hours
                 </li>
             </ul>
+        </div>
+        
+        <!-- What to Expect -->
+        <div class="bg-green-50 rounded-lg p-6 mb-8 border border-green-200">
+            <h3 class="font-semibold text-green-800 mb-3 flex items-center justify-center">
+                <i class="fas fa-clock mr-2"></i>
+                What to Expect Next
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div class="text-center">
+                    <div class="bg-green-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2">
+                        <span class="font-bold text-green-700">1</span>
+                    </div>
+                    <p class="text-green-700">Confirmation Email</p>
+                    <p class="text-green-600 text-xs">Within 5 minutes</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-blue-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2">
+                        <span class="font-bold text-blue-700">2</span>
+                    </div>
+                    <p class="text-blue-700">Team Review</p>
+                    <p class="text-blue-600 text-xs">Within 2 hours</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-purple-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2">
+                        <span class="font-bold text-purple-700">3</span>
+                    </div>
+                    <p class="text-purple-700">Detailed Response</p>
+                    <p class="text-purple-600 text-xs">Within 24 hours</p>
+                </div>
+            </div>
         </div>
         
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -43,10 +81,12 @@
                class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-300 font-medium">
                 <i class="fas fa-paper-plane mr-2"></i>Send Another Message
             </a>
+            {% if user.is_authenticated %}
             <a href="{% url 'contact:my_contact_messages' %}" 
                class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300 font-medium">
                 <i class="fas fa-history mr-2"></i>View My Messages
             </a>
+            {% endif %}
         </div>
         
         <!-- Support Information -->
@@ -61,7 +101,20 @@
                     <i class="fas fa-envelope mr-2 text-blue-600"></i>
                     <span>support@medicareai.com</span>
                 </div>
+                <div class="flex items-center text-gray-600">
+                    <i class="fas fa-clock mr-2 text-purple-600"></i>
+                    <span>24/7 Support Available</span>
+                </div>
             </div>
+        </div>
+        
+        <!-- Troubleshooting -->
+        <div class="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+            <p class="text-sm text-yellow-700">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                Didn't receive the confirmation email? Check your spam folder or 
+                <a href="{% url 'contact:contact_page' %}" class="text-yellow-800 font-semibold hover:underline">contact us again</a>.
+            </p>
         </div>
     </div>
 </div>

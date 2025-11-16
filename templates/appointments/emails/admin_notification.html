@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
+        .appointment-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #6c757d; }
+        .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 14px; }
+        .risk-high { color: #dc3545; font-weight: bold; background: #f8d7da; padding: 2px 6px; border-radius: 3px; }
+        .risk-medium { color: #856404; font-weight: bold; background: #fff3cd; padding: 2px 6px; border-radius: 3px; }
+        .risk-low { color: #155724; font-weight: bold; background: #d4edda; padding: 2px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>New Appointment Booking 📈</h1>
+            <p>System notification for administrative tracking</p>
+        </div>
+        
+        <div class="content">
+            <h2>Administrative Notification</h2>
+            <p>A new appointment has been booked in the MediCare AI system.</p>
+            
+            <div class="appointment-details">
+                <h3>📊 Booking Summary</h3>
+                <p><strong>Appointment ID:</strong> #{{ appointment.id }}</p>
+                <p><strong>Booking Time:</strong> {{ appointment.created_at|date:"F d, Y H:i" }}</p>
+                <p><strong>Status:</strong> {{ appointment.get_status_display }}</p>
+            </div>
+
+            <div class="appointment-details">
+                <h3>👥 Participant Details</h3>
+                <p><strong>Patient:</strong> {{ patient.get_full_name }} ({{ patient.email }})</p>
+                <p><strong>Doctor:</strong> Dr. {{ doctor.get_full_name }} - {{ doctor_profile.get_specialization_display }}</p>
+                <p><strong>Consultation Fee:</strong> ${{ doctor_profile.consultation_fee }}</p>
+            </div>
+
+            <div class="appointment-details">
+                <h3>📅 Appointment Information</h3>
+                <p><strong>Date:</strong> {{ appointment_date }}</p>
+                <p><strong>Time:</strong> {{ appointment_time }}</p>
+                <p><strong>Reason:</strong> {{ appointment.reason }}</p>
+                {% if appointment.symptoms %}
+                <p><strong>Symptoms:</strong> {{ appointment.symptoms|truncatewords:20 }}</p>
+                {% endif %}
+            </div>
+
+            {% if appointment.prediction_score %}
+            <div class="appointment-details">
+                <h3>🤖 AI Analytics</h3>
+                <p><strong>No-show Probability:</strong> 
+                    <span class="{% if appointment.prediction_score > 0.7 %}risk-high{% elif appointment.prediction_score > 0.4 %}risk-medium{% else %}risk-low{% endif %}">
+                        {{ no_show_risk }}
+                    </span>
+                </p>
+                <p><strong>Risk Level:</strong> 
+                    {% if appointment.prediction_score > 0.7 %}
+                    HIGH - Consider proactive reminder strategy
+                    {% elif appointment.prediction_score > 0.4 %}
+                    MEDIUM - Standard reminder procedure
+                    {% else %}
+                    LOW - Normal follow-up sufficient
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
+
+            <div class="appointment-details">
+                <h3>📈 System Metrics</h3>
+                <p><strong>Platform Usage:</strong> New appointment adds to today's total bookings</p>
+                <p><strong>Revenue:</strong> ${{ doctor_profile.consultation_fee }} added to pending revenue</p>
+                <p><strong>Doctor Schedule:</strong> Dr. {{ doctor.get_full_name }}'s schedule updated</p>
+            </div>
+
+            <div style="background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h4 style="margin-top: 0; color: #0056b3;">✅ Action Completed</h4>
+                <ul style="margin-bottom: 0;">
+                    <li>Appointment successfully recorded in database</li>
+                    <li>Confirmation emails sent to patient and doctor</li>
+                    <li>AI no-show prediction calculated</li>
+                    <li>System metrics updated</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>MediCare AI - Administrative System</strong></p>
+            <p>This is an automated administrative notification.</p>
+            <p>Generated on: {% now "F d, Y H:i" %}</p>
+        </div>
+    </div>
+</body>
+</html>

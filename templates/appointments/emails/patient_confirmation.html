@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
+        .appointment-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea; }
+        .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 14px; }
+        .button { background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 10px 0; }
+        .risk-high { color: #dc3545; font-weight: bold; }
+        .risk-medium { color: #ffc107; font-weight: bold; }
+        .risk-low { color: #28a745; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Appointment Confirmed! 🎉</h1>
+            <p>Your healthcare appointment has been successfully scheduled</p>
+        </div>
+        
+        <div class="content">
+            <h2>Hello {{ patient.get_full_name }},</h2>
+            <p>Thank you for booking your appointment with MediCare AI. Here are your appointment details:</p>
+            
+            <div class="appointment-details">
+                <h3>📅 Appointment Details</h3>
+                <p><strong>Doctor:</strong> Dr. {{ doctor.get_full_name }}</p>
+                <p><strong>Specialization:</strong> {{ doctor_profile.get_specialization_display }}</p>
+                <p><strong>Date:</strong> {{ appointment_date }}</p>
+                <p><strong>Time:</strong> {{ appointment_time }}</p>
+                <p><strong>Reason:</strong> {{ appointment.reason }}</p>
+                {% if appointment.symptoms %}
+                <p><strong>Symptoms:</strong> {{ appointment.symptoms }}</p>
+                {% endif %}
+                <p><strong>Consultation Fee:</strong> ${{ doctor_profile.consultation_fee }}</p>
+            </div>
+
+            <div class="appointment-details">
+                <h3>📍 Location & Preparation</h3>
+                <p><strong>Clinic Address:</strong><br>
+                123 Health Street<br>
+                Medical City, MC 12345</p>
+                
+                <p><strong>Please Bring:</strong></p>
+                <ul>
+                    <li>Your ID and insurance card</li>
+                    <li>List of current medications</li>
+                    <li>Any relevant medical records</li>
+                    <li>Payment method for consultation fee</li>
+                </ul>
+            </div>
+
+            {% if appointment.prediction_score %}
+            <div class="appointment-details">
+                <h3>📊 AI Health Insights</h3>
+                <p>Our AI system has analyzed your appointment details:</p>
+                <p><strong>No-show Risk Assessment:</strong> 
+                    <span class="{% if appointment.prediction_score > 0.7 %}risk-high{% elif appointment.prediction_score > 0.4 %}risk-medium{% else %}risk-low{% endif %}">
+                        {{ no_show_risk }}
+                    </span>
+                </p>
+                <p><em>This helps us optimize scheduling and ensure you receive the best care.</em></p>
+            </div>
+            {% endif %}
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="http://127.0.0.1:8000{% url 'appointments:appointments_list' %}" class="button">View My Appointments</a>
+            </div>
+
+            <div class="appointment-details">
+                <h3>📋 Important Reminders</h3>
+                <ul>
+                    <li>🕒 Please arrive 15 minutes before your scheduled time</li>
+                    <li>📞 Call us at +1 (555) 123-4567 if you need to reschedule</li>
+                    <li>💊 Bring all current medications with you</li>
+                    <li>📝 Prepare any questions you have for the doctor</li>
+                </ul>
+            </div>
+
+            <p>We look forward to helping you with your healthcare needs!</p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>MediCare AI - Smart Healthcare Solutions</strong></p>
+            <p>Email: support@medicareai.com | Phone: +1 (555) 123-4567</p>
+            <p>123 Health Street, Medical City, MC 12345</p>
+            <p><em>This is an automated message. Please do not reply to this email.</em></p>
+        </div>
+    </div>
+</body>
+</html>
