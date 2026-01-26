@@ -6,6 +6,7 @@ from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm
 from appointments.models import Appointment
 from doctors.models import Doctor
 from django.utils import timezone
+from django.contrib.auth.views import LoginView
 
 def home(request):
     return render(request, 'users/home.html')
@@ -33,7 +34,20 @@ def register(request):
         form = UserRegistrationForm()
     
     return render(request, 'users/register.html', {'form': form})
+class CustomLoginView(LoginView):
+    template_name = 'users/login.html'
 
+    def form_valid(self, form):
+        """Override to set a success message on valid login"""
+        response = super().form_valid(form)
+        messages.success(self.request, "Successfully logged in.")
+        return response
+
+    def form_invalid(self, form):
+        """Override to set an error message on invalid login"""
+        response = super().form_invalid(form)
+        messages.error(self.request, "Invalid username or password. Please try again.")
+        return response
 def custom_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
