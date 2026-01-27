@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block title %}Retrain AI Model - MediCare AI{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <div class="bg-gradient-to-r from-purple-600 to-pink-700 rounded-2xl p-8 text-white">
+            <i class="fas fa-brain text-5xl mb-6"></i>
+            <h1 class="text-4xl font-bold mb-4">Retrain AI Model</h1>
+            <p class="text-xl text-purple-100">
+                Advanced model retraining and optimization
+            </p>
+            <p class="text-purple-200 mt-2 text-sm">
+                Available to administrators only
+            </p>
+        </div>
+    </div>
+
+    <!-- Current Model Status -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            <i class="fas fa-info-circle mr-3 text-blue-600"></i>
+            Current Model Status
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h3 class="font-semibold text-gray-700 mb-2">Model Information</h3>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Model Type:</span>
+                        <span class="font-medium">Ensemble (3 models)</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Diseases Covered:</span>
+                        <span class="font-medium">{{ total_diseases|default:"Unknown" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Last Trained:</span>
+                        <span class="font-medium">{{ last_trained|default:"Unknown" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Accuracy:</span>
+                        <span class="font-medium text-green-600">{{ accuracy|default:"Unknown" }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h3 class="font-semibold text-gray-700 mb-2">Model Components</h3>
+                <ul class="space-y-2">
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span>Random Forest Classifier</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span>Gradient Boosting Classifier</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span>Multinomial Naive Bayes</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <span>TF-IDF Vectorizer</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Retraining Form -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            <i class="fas fa-cogs mr-3 text-purple-600"></i>
+            Retraining Configuration
+        </h2>
+        
+        <form method="POST" id="retrainForm">
+            {% csrf_token %}
+            
+            <div class="space-y-6">
+                <!-- Training Parameters -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Training Parameters</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Samples per Disease
+                            </label>
+                            <select name="samples_per_disease" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="100">100 samples (Fast)</option>
+                                <option value="150" selected>150 samples (Balanced)</option>
+                                <option value="200">200 samples (Accurate)</option>
+                                <option value="300">300 samples (High Accuracy)</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Test Split Ratio
+                            </label>
+                            <select name="test_split" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="0.1">10% (More training data)</option>
+                                <option value="0.2" selected>20% (Standard)</option>
+                                <option value="0.3">30% (More validation)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Selection -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Select Models to Train</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="models" value="random_forest" checked 
+                                   class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                            <span class="ml-3 text-gray-700">
+                                Random Forest (High accuracy, slower training)
+                            </span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="models" value="gradient_boosting" checked 
+                                   class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                            <span class="ml-3 text-gray-700">
+                                Gradient Boosting (Good for complex patterns)
+                            </span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="models" value="naive_bayes" checked 
+                                   class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                            <span class="ml-3 text-gray-700">
+                                Naive Bayes (Fast, good for text data)
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Feature Engineering -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Feature Engineering</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                N-gram Range
+                            </label>
+                            <select name="ngram_range" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="1">Unigrams only</option>
+                                <option value="1,2" selected>Unigrams + Bigrams</option>
+                                <option value="1,3">Unigrams to Trigrams</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Max Features
+                            </label>
+                            <select name="max_features" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-purple-500">
+                                <option value="1000">1000 features</option>
+                                <option value="2000" selected>2000 features</option>
+                                <option value="5000">5000 features</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="flex">
+                        <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
+                        <div>
+                            <h4 class="font-semibold text-yellow-800">Important Notice</h4>
+                            <p class="text-yellow-700 text-sm mt-1">
+                                Retraining will overwrite the current model. This process may take several minutes 
+                                depending on the selected parameters. The symptom checker will be unavailable 
+                                during retraining.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit" 
+                            id="retrainButton"
+                            class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-6 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl">
+                        <i class="fas fa-cogs mr-2"></i>
+                        Start Model Retraining
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-md mx-4">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Training AI Model</h3>
+                <p class="text-gray-600 mb-4">This may take a few minutes. Please don't close this window.</p>
+                <div class="space-y-2">
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-database mr-2"></i>
+                        <span>Generating training data...</span>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-brain mr-2"></i>
+                        <span>Training ensemble models...</span>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-save mr-2"></i>
+                        <span>Saving model files...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('retrainForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Show loading overlay
+        document.getElementById('loadingOverlay').classList.remove('hidden');
+        
+        // Disable submit button
+        const submitBtn = document.getElementById('retrainButton');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Training in progress...';
+        
+        // Submit form
+        this.submit();
+    });
+
+    // If there are messages, scroll to them
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelector('.messages');
+        if (messages) {
+            messages.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+</script>
+{% endblock %}

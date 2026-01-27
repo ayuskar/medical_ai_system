@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Symptom Check - MediCare AI{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Emergency Header -->
+    <div class="text-center mb-12">
+        <div class="bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl p-8 text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 opacity-10">
+                <i class="fas fa-ambulance text-9xl"></i>
+            </div>
+            <div class="relative">
+                <i class="fas fa-exclamation-triangle text-5xl mb-6"></i>
+                <h1 class="text-4xl font-bold mb-4">Emergency Symptom Check</h1>
+                <p class="text-xl text-red-100">
+                    Critical symptoms requiring immediate attention
+                </p>
+                <div class="mt-6">
+                    <div class="inline-flex items-center bg-red-700 px-4 py-2 rounded-full">
+                        <i class="fas fa-phone-alt mr-2"></i>
+                        <span class="font-bold text-lg">Call {{ emergency_number }} for emergencies</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Message -->
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8">
+        <div class="flex">
+            <i class="fas fa-exclamation-circle text-red-500 text-2xl mt-1 mr-4"></i>
+            <div>
+                <h3 class="text-xl font-bold text-red-800 mb-2">⚠️ IMPORTANT WARNING</h3>
+                <p class="text-red-700 mb-3">
+                    <strong>This tool is NOT a substitute for emergency medical care.</strong> 
+                    If you or someone else is experiencing any of the symptoms below, 
+                    <strong>seek immediate medical attention</strong>.
+                </p>
+                <p class="text-red-600 text-sm">
+                    Do not wait for online advice. Call emergency services or go to the nearest emergency room.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Critical Symptoms -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            <i class="fas fa-heartbeat mr-3 text-red-600"></i>
+            Critical Symptoms Requiring Immediate Attention
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for symptom in critical_symptoms %}
+            <div class="border border-red-200 rounded-lg p-4 hover:bg-red-50 transition duration-300">
+                <div class="flex items-start">
+                    <div class="bg-red-100 p-2 rounded-lg mr-4">
+                        <i class="fas fa-exclamation text-red-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800 text-lg">{{ symptom }}</h3>
+                        <p class="text-gray-600 text-sm mt-1">
+                            {% if symptom == 'chest pain' %}
+                            Especially if spreading to arms, neck, jaw, or back
+                            {% elif symptom == 'difficulty breathing' %}
+                            If unable to catch breath or gasping for air
+                            {% elif symptom == 'severe bleeding' %}
+                            That cannot be controlled with pressure
+                            {% elif symptom == 'sudden weakness' %}
+                            Especially on one side of the body
+                            {% elif symptom == 'loss of consciousness' %}
+                            Even if only for a few seconds
+                            {% elif symptom == 'severe headache' %}
+                            "Worst headache of your life" or sudden onset
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- What to Do -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white mb-8">
+        <h2 class="text-2xl font-bold mb-6">What to Do in an Emergency</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="font-semibold mb-4 flex items-center">
+                    <i class="fas fa-phone-alt mr-2"></i>
+                    Call Emergency Services
+                </h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
+                        <span>Dial <strong>{{ emergency_number }}</strong> immediately</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
+                        <span>Stay calm and speak clearly</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
+                        <span>Provide your exact location</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
+                        <span>Describe the symptoms clearly</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3 class="font-semibold mb-4 flex items-center">
+                    <i class="fas fa-first-aid mr-2"></i>
+                    While Waiting for Help
+                </h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
+                        <span>Stay with the person</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
+                        <span>Keep them calm and comfortable</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
+                        <span>Do not give food or drink</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
+                        <span>Be ready to provide medical history</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Services Information -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Emergency Services Information</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-ambulance text-2xl text-red-600"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Ambulance</h3>
+                <p class="text-gray-600 text-sm">Emergency medical transport</p>
+                <div class="mt-2">
+                    <span class="text-2xl font-bold text-red-600">{{ emergency_number }}</span>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-hospital text-2xl text-blue-600"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Nearest Hospital</h3>
+                <p class="text-gray-600 text-sm">Emergency Department</p>
+                <div class="mt-2">
+                    <a href="#" class="text-blue-600 font-semibold hover:text-blue-800">
+                        Find nearest hospital →
+                    </a>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-md text-2xl text-green-600"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-2">Urgent Care</h3>
+                <p class="text-gray-600 text-sm">Non-life threatening emergencies</p>
+                <div class="mt-2">
+                    <a href="#" class="text-green-600 font-semibold hover:text-green-800">
+                        Find urgent care centers →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Non-Emergency Options -->
+    <div class="bg-gray-50 rounded-2xl p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">For Non-Emergency Symptoms</h2>
+        <p class="text-gray-600 mb-6">
+            If your symptoms are not listed above but you're still concerned, you can:
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <a href="{% url 'ai_predictions:symptom_checker' %}" 
+               class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition duration-300 border border-blue-200">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                        <i class="fas fa-robot text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800 text-lg">Use Symptom Checker</h3>
+                        <p class="text-gray-600 text-sm mt-1">AI-powered analysis of your symptoms</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="{% url 'doctors:doctors_list' %}" 
+               class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition duration-300 border border-green-200">
+                <div class="flex items-center">
+                    <div class="bg-green-100 p-3 rounded-lg mr-4">
+                        <i class="fas fa-user-md text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800 text-lg">Find a Doctor</h3>
+                        <p class="text-gray-600 text-sm mt-1">Book appointment with healthcare professional</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="mt-8 text-center text-gray-600 text-sm">
+        <p>
+            <i class="fas fa-info-circle mr-1"></i>
+            This information is for educational purposes only. In case of emergency, 
+            always call {{ emergency_number }} or go to the nearest emergency room.
+        </p>
+        <p class="mt-2">
+            Last updated: {{ current_year }}
+        </p>
+    </div>
+</div>
+
+<style>
+    .emergency-flash {
+        animation: flash 2s infinite;
+    }
+    
+    @keyframes flash {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+</style>
+
+<script>
+    // Make emergency numbers clickable
+    document.addEventListener('DOMContentLoaded', function() {
+        const emergencyNumbers = document.querySelectorAll('.emergency-number');
+        emergencyNumbers.forEach(function(el) {
+            el.addEventListener('click', function() {
+                const number = this.textContent.replace(/\D/g, '');
+                window.location.href = 'tel:' + number;
+            });
+        });
+        
+        // Add pulsing animation to emergency header
+        const emergencyHeader = document.querySelector('.bg-gradient-to-r.from-red-600');
+        if (emergencyHeader) {
+            emergencyHeader.classList.add('emergency-flash');
+        }
+    });
+</script>
+{% endblock %}
