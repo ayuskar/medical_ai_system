@@ -1,7 +1,12 @@
 MediCare AI Healthcare Platform - Complete Explanation
+
 (**first insert your email and the generated password in settings.py)
+
+
 Project Overview
 I've developed MediCare AI, a comprehensive AI-powered healthcare management platform that serves as a bridge between patients and healthcare providers. This is a full-stack web application built with Django framework, designed to modernize healthcare interactions through intelligent technology and user-centered design.
+
+
 🏥 What is MediCare AI?
 MediCare AI is an integrated healthcare ecosystem that combines traditional medical appointment management with cutting-edge artificial intelligence capabilities. The platform handles the complete healthcare journey from symptom checking to appointment booking, doctor consultations, and post-visit feedback analysis.
 
