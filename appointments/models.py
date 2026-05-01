@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+import datetime
 
 class Appointment(models.Model):
     STATUS_CHOICES = [
@@ -33,12 +34,18 @@ class Appointment(models.Model):
         return self.date >= timezone.now().date() and self.status in ['pending', 'confirmed']
     
     def can_be_cancelled(self):
+        """Check if appointment can be cancelled"""
         # Allow cancellation if appointment is pending/confirmed and date is in the future
-        from django.utils import timezone
-        from datetime import datetime
-        appointment_datetime = datetime.combine(self.date, self.time)
+        if self.status not in ['pending', 'confirmed']:
+            return False
+        
+        # Combine date and time to create a datetime
+        appointment_datetime = timezone.make_aware(
+            datetime.datetime.combine(self.date, self.time)
+        )
         current_datetime = timezone.now()
-        return self.status in ['pending', 'confirmed'] and appointment_datetime > current_datetime
+        
+        return appointment_datetime > current_datetime
 
 class TimeSlot(models.Model):
     doctor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='time_slots')

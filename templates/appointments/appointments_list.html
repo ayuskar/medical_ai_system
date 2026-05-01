@@ -93,7 +93,7 @@
                                     </div>
                                     <div class="text-sm text-gray-500">
                                         {% if user.profile.role == 'patient' %}
-                                        {{ appointment.doctor.doctor.specialization }}
+                                        {{ appointment.doctor.doctor_profile.get_specialization_display|default:"-" }}
                                         {% else %}
                                         {{ appointment.patient.email }}
                                         {% endif %}

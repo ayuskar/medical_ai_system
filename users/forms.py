@@ -1,81 +1,88 @@
+# forms.py
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from .models import Profile
+from doctors.models import Doctor
 
 class UserRegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={
-        'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300',
-        'placeholder': 'Enter your email'
-    }))
-    first_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={
-        'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300',
-        'placeholder': 'Enter your first name'
-    }))
-    last_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={
-        'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300',
-        'placeholder': 'Enter your last name'
-    }))
-    role = forms.ChoiceField(choices=Profile.ROLE_CHOICES, required=True, widget=forms.Select(attrs={
-        'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300'
-    }))
-    phone = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={
-        'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300',
-        'placeholder': 'Enter your phone number'
-    }))
-    date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={
-        'type': 'date',
-        'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300'
-    }))
-    address = forms.CharField(widget=forms.Textarea(attrs={
-        'rows': 3,
-        'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300',
-        'placeholder': 'Enter your address'
-    }), required=False)
-    profile_picture = forms.ImageField(required=False, widget=forms.FileInput(attrs={
-        'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300',
-        'accept': 'image/*'
-    }))
-
+    # Profile fields
+    role = forms.ChoiceField(choices=Profile.ROLE_CHOICES, widget=forms.Select(attrs={'class': 'form-control', 'id': 'role-select'}))
+    phone = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
+    address = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}))
+    profile_picture = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+    
+    # Doctor fields (optional initially)
+    specialization = forms.ChoiceField(choices=Doctor.SPECIALIZATION_CHOICES, required=False, widget=forms.Select(attrs={'class': 'form-control doctor-field'}))
+    experience = forms.IntegerField(required=False, min_value=0, widget=forms.NumberInput(attrs={'class': 'form-control doctor-field'}))
+    about = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control doctor-field', 'rows': 3}))
+    consultation_fee = forms.DecimalField(required=False, min_value=0, decimal_places=2, widget=forms.NumberInput(attrs={'class': 'form-control doctor-field'}))
+    license_number = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control doctor-field'}))
+    
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
         widgets = {
-            'username': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300',
-                'placeholder': 'Choose a username'
-            }),
-            'password1': forms.PasswordInput(attrs={
-                'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300',
-                'placeholder': 'Enter your password'
-            }),
-            'password2': forms.PasswordInput(attrs={
-                'class': 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300',
-                'placeholder': 'Confirm your password'
-            }),
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
-
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        role = cleaned_data.get('role')
+        
+        # Validate doctor fields if role is doctor
+        if role == 'doctor':
+            specialization = cleaned_data.get('specialization')
+            experience = cleaned_data.get('experience')
+            consultation_fee = cleaned_data.get('consultation_fee')
+            license_number = cleaned_data.get('license_number')
+            
+            if not specialization:
+                self.add_error('specialization', 'Specialization is required for doctors')
+            if not experience:
+                self.add_error('experience', 'Experience is required for doctors')
+            if not consultation_fee:
+                self.add_error('consultation_fee', 'Consultation fee is required for doctors')
+            if not license_number:
+                self.add_error('license_number', 'License number is required for doctors')
+        
+        return cleaned_data
+    
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
-        
         if commit:
             user.save()
-            profile = user.profile
-            profile.role = self.cleaned_data['role']
-            profile.phone = self.cleaned_data['phone']
-            profile.date_of_birth = self.cleaned_data['date_of_birth']
-            profile.address = self.cleaned_data['address']
             
-            # Handle profile picture
-            if 'profile_picture' in self.files and self.files['profile_picture']:
-                profile.profile_picture = self.files['profile_picture']
+            # Save profile
+            profile = Profile.objects.get(user=user)
+            profile.role = self.cleaned_data.get('role')
+            profile.phone = self.cleaned_data.get('phone')
+            profile.date_of_birth = self.cleaned_data.get('date_of_birth')
+            profile.address = self.cleaned_data.get('address')
+            
+            if self.cleaned_data.get('profile_picture'):
+                profile.profile_picture = self.cleaned_data.get('profile_picture')
             
             profile.save()
+            
+            # Create doctor profile if role is doctor
+            if self.cleaned_data.get('role') == 'doctor':
+                Doctor.objects.create(
+                    user=user,
+                    specialization=self.cleaned_data.get('specialization'),
+                    experience=self.cleaned_data.get('experience'),
+                    about=self.cleaned_data.get('about', ''),
+                    consultation_fee=self.cleaned_data.get('consultation_fee'),
+                    license_number=self.cleaned_data.get('license_number'),
+                    is_available=True
+                )
         
         return user
+
 
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={

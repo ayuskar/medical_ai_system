@@ -1,3 +1,4 @@
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -21,8 +22,13 @@ def appointments_list(request):
     
     if user.profile.role == 'patient':
         appointments = Appointment.objects.filter(patient=user)
-    else:
-        appointments = Appointment.objects.filter(doctor=user)
+    else:  # doctor or admin
+        # Fix: Use doctor_profile instead of doctor
+        # We need to check if the user has a doctor_profile
+        if hasattr(user, 'doctor_profile'):
+            appointments = Appointment.objects.filter(doctor=user)
+        else:
+            appointments = Appointment.objects.none()
     
     # Filter by status
     status_filter = request.GET.get('status')
@@ -56,8 +62,6 @@ def appointments_list(request):
         'completed_appointments': completed_appointments,
     }
     return render(request, 'appointments/appointments_list.html', context)
-
-@login_required
 def update_appointment_status(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id)
     
@@ -80,7 +84,6 @@ def update_appointment_status(request, appointment_id):
             messages.success(request, f'Appointment status updated to {new_status}.')
     
     return redirect('appointments:appointments_list')
-
 @login_required
 def appointment_detail(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id)
@@ -94,12 +97,12 @@ def appointment_detail(request, appointment_id):
         'appointment': appointment,
     }
     return render(request, 'appointments/appointment_detail.html', context)
-
 @login_required
 def book_appointment(request, doctor_id):
     from django.contrib.auth.models import User
-    doctor_user = get_object_or_404(User, doctor__id=doctor_id, doctor__is_available=True)
-    doctor = doctor_user.doctor
+    # Fix: Use doctor_profile instead of doctor
+    doctor_user = get_object_or_404(User, doctor_profile__id=doctor_id, doctor_profile__is_available=True)
+    doctor = doctor_user.doctor_profile  # Access through doctor_profile
     
     if request.method == 'POST':
         form = AppointmentForm(request.POST)
@@ -148,16 +151,18 @@ def book_appointment(request, doctor_id):
         'doctor': doctor,
     }
     return render(request, 'appointments/book_appointment.html', context)
-
 def send_appointment_confirmation_emails(appointment):
     """Send confirmation emails to patient, doctor, and admin when appointment is booked"""
     try:
+        # Get doctor profile (using doctor_profile related name)
+        doctor_profile = appointment.doctor.doctor_profile if hasattr(appointment.doctor, 'doctor_profile') else None
+        
         # Email data for templates
         email_context = {
             'appointment': appointment,
             'patient': appointment.patient,
             'doctor': appointment.doctor,
-            'doctor_profile': appointment.doctor.doctor,
+            'doctor_profile': doctor_profile,
             'appointment_date': appointment.date.strftime('%B %d, %Y'),
             'appointment_time': appointment.time.strftime('%I:%M %p'),
             'no_show_risk': f"{appointment.prediction_score * 100:.1f}%" if appointment.prediction_score else "Not calculated",
@@ -211,6 +216,7 @@ def send_appointment_confirmation_emails(appointment):
         
     except Exception as e:
         logger.error(f"Failed to send appointment confirmation emails: {str(e)}")
+
 
 def send_appointment_status_update_emails(appointment, old_status, new_status, updated_by):
     """Send emails when appointment status is updated"""

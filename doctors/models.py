@@ -1,7 +1,4 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import User
 
 class Doctor(models.Model):
@@ -18,7 +15,7 @@ class Doctor(models.Model):
         ('surgery', 'Surgery'),
     ]
     
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='doctor_profile')
     specialization = models.CharField(max_length=50, choices=SPECIALIZATION_CHOICES)
     experience = models.IntegerField(default=0)
     about = models.TextField(blank=True)

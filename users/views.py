@@ -10,7 +10,6 @@ from django.contrib.auth.views import LoginView
 
 def home(request):
     return render(request, 'users/home.html')
-
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, request.FILES)
@@ -24,7 +23,13 @@ def register(request):
             
             if user is not None:
                 login(request, user)
-                messages.success(request, f'Account created successfully! Welcome, {user.get_full_name()}!')
+                
+                # Different success message based on role
+                if hasattr(user, 'profile') and user.profile.role == 'doctor':
+                    messages.success(request, f'Account created successfully! Welcome Dr. {user.get_full_name()}! Your doctor profile has been created.')
+                else:
+                    messages.success(request, f'Account created successfully! Welcome, {user.get_full_name()}!')
+                
                 return redirect('dashboard')
             else:
                 messages.error(request, 'There was an error logging in after registration.')
@@ -34,6 +39,7 @@ def register(request):
         form = UserRegistrationForm()
     
     return render(request, 'users/register.html', {'form': form})
+
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'
 
