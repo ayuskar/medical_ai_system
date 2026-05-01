@@ -167,7 +167,6 @@ def send_appointment_confirmation_emails(appointment):
             'appointment_time': appointment.time.strftime('%I:%M %p'),
             'no_show_risk': f"{appointment.prediction_score * 100:.1f}%" if appointment.prediction_score else "Not calculated",
         }
-        
         # 1. Email to Patient
         patient_subject = f"✅ Appointment Confirmed with Dr. {appointment.doctor.get_full_name()}"
         patient_html_message = render_to_string('appointments/emails/patient_confirmation.html', email_context)
